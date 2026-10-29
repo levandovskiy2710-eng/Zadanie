@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+body {
+    background-color: white;
+    font-family: Arial;
+}
+
+#kontener {
+    background-color: whitesmoke;
+    padding: 10px;
+    width: 90%;
+}
+
+.g1, .g2 {
+    border: 1px solid steelblue;
+    margin: 10px;
+    width: 95%;
+    background-color: whitesmoke;
+}
+
+input {
+    flex: 1;
+}
+
+
+button {
+    background-color: steelblue;
+    color: white;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+    <form id="myForm">
+    <button type="button" onclick="dodaj()">ADD QUESTION GROUP +</button>
+    <div id="kontener"></div>
+    
+    <div id="szablon1">
+        <div class="g1">
+            <div>
+                <button>^</button>
+                <button>⌄</button>
+                <span>Question group</span>
+                <input type="text">
+                <button type="button" onclick="skasuj(this)">-</button>
+                <button type="button" onclick="schowaj('blok')">⬆</button>
+            </div>
+            <div class="quesgroup" id="blok">
+                <div>Question group intro</div>
+                <button type="button" onclick="initeditor()">INIT TEXT EDITOR</button>
+                <br><br><br>
+                <button type="button" onclick="kategoria()">ADD CATEGORY +</button>
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <div id="szablon">
+        <div class="g2">
+            <div>
+                <button >^</button>
+                <button>⌄</button>
+                <span>Category</span>
+                <input type="text">
+                <button onclick="skasuj(this)">-</button>
+                <button onclick="ukryj('blokii')">^</button>
+            </div>
+            <div id="blokii">
+                <div>Category intro</div>
+                <button onclick="initeditor()">INIT TEXT EDITOR</button>
+                <br><br><br>
+                <button>ADD QUESTION +</button>
+            </div>
+            <hr>
+        </div>
+    </div>
+    <button type="submit">SEND FORM</button>
+    <button type="button" onclick="zapisz()">
+    Zapisz JSON
+</button>
+
+<input type="file" id="plik" accept=".json">
+<button type="button" onclick="wczytaj()">Wczytaj JSON</button>
+    </form>
+
+    <script>
+        var licznik = 0;
+        var katlicz = 0;
+        var szablon = document.getElementById("szablon1");
+        szablon.style.display = "none";
+        
+        var szablonkat = document.getElementById("szablon");
+        szablonkat.style.display = "none";
+
+        function dodaj() {
+            licznik++;
+            var forma = document.createElement("div");
+            var zawartosc = szablon.cloneNode(true);
+
+            zawartosc.style.display = "block";
+            zawartosc.id = "";
+
+            forma.appendChild(zawartosc);
+            
+            var kontener = document.getElementById("kontener");
+            kontener.appendChild(forma);
+        }
+
+        function kategoria() {
+            katlicz++;
+            var nowakat = document.createElement("div");
+            var kategor = szablonkat.cloneNode(true);
+            kategor.style.display = "block";
+            kategor.id = "";
+            nowakat.appendChild(kategor);
+
+            var grupa = event.target.closest('.quesgroup');
+            grupa.appendChild(nowakat);
+        }
+
+        function schowaj(id) {
+            var tresc = document.getElementById(id);
+            if (tresc.style.display === "none") {
+                tresc.style.display = "block";
+            } else {
+                tresc.style.display = "none";
+            }
+        }
+
+        function ukryj(id) {
+            var tresc = document.getElementById(id);
+            if (tresc.style.display === "none") {
+                tresc.style.display = "block";
+            } else {
+                tresc.style.display = "none";
+            }
+        }
+
+        function skasuj(przycisk) {
+            przycisk.closest('.g1, .g2').remove();
+        }
+        function initeditor(){
+            var ta = document.createElement("textarea");
+            event.target.closest('div').appendChild(ta);
+        } function aktualizujIndeksy() {
+    var kontener = document.getElementById("kontener");
+    for (var i = 0; i < kontener.children.length; i++) {
+        var grupa = kontener.children[i].children[0];
+        var input = grupa.children[0].children[3];
+        input.id = "inputGrupa" + i;
+        var sekcja = grupa.children[1];
+        var kategorie = sekcja.children[6];
+        for (var j = 0; j < kategorie.children.length; j++) {
+            var kategoria = kategorie.children[j].children[0];
+            var inputKategorii = kategoria.children[0].children[3];
+            inputKategorii.id = "inputKategoria" + i + "_" + j;
+        }
+    }
+}
+function zapisz() {
+    var dane = {
+        tekst: document.getElementById("kontener").innerHTML
+    };
+    var json = JSON.stringify(dane);
+    var link = document.createElement("a");
+    link.href = "data:application/json," + json;
+    link.download = "dane.json";
+    link.click();
+}
+function wczytaj() {
+    var plik = document.getElementById("plik").files[0];
+
+    if (plik == null) {
+        alert("Wybierz plik!");
+        return;
+    }
+
+    var czytnik = new FileReader();
+
+    czytnik.onload = function() {
+        var dane = JSON.parse(czytnik.result);
+        document.getElementById("kontener").innerHTML = dane.tekst;
+    };
+
+    czytnik.readAsText(plik);
+}
+    </script>
+</body>
+</html>
